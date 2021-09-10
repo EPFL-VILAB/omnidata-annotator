@@ -150,7 +150,7 @@ ZBuffer depth is defined as the distance to the camera plane. The depth sensitiv
 | Replica | Google Objects  | Hypersim  | BlendedMVG  |
 | :-------------:|:-------------:|:-------------:|:-------------:|
 | ![](./assets/replica/point_156_view_10_domain_rgb.png) | ![](./assets/google-objects/point_21_view_5_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_rgb.png) |
-| ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/replica-gso/point_85_view_0_domain_depth_zbuffer2.png)|![](./assets/hypersim/point_754_view_16_domain_normal.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_depth_zbuffer.png)
+| ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/replica-gso/point_21_view_5_domain_depth_zbuffer.png)|![](./assets/hypersim/point_85_view_0_domain_depth_zbuffer2.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_depth_zbuffer.png)
 
 
 ### 4. Depth Euclidean:
@@ -163,7 +163,7 @@ Euclidean depth is measured as the distance from each pixel to the camera’s op
 
 | Taskonomy | Clevr  | BlendedMVG  |
 | :-------------:|:-------------:|:-------------:|
-| ![](./assets/taskonomy/point_21_view_2_domain_rgb.png) | ![](./assets/clevr/point_2368_view_0_domain_rgb.png) |![](./assets/blendedMVG/point_85_view_0_domain_rgb.png) | ![](./assets/blendedMVG/point_979_view_0_domain_rgb.png) |
+| ![](./assets/taskonomy/point_21_view_2_domain_rgb.png) | ![](./assets/clevr/point_2368_view_0_domain_rgb.png) |![](./assets/blendedMVG/point_979_view_0_domain_rgb.png) |
 | ![](./assets/taskonomy/point_21_view_2_domain_depth_euclidean2.png) | ![](./assets/clevr/point_2368_view_0_domain_depth_euclidean2.png) | ![](./assets/blendedMVG/point_979_view_0_domain_depth_euclidean.png)
 
 ### 5. Re(shading):
@@ -176,7 +176,7 @@ To generate reshading images :
 
 | Taskonomy | Google Objects  | Hypersim  |
 | :-------------:|:-------------:|:-------------:|
-| ![](./assets/taskonomy/point_202_view_5_domain_rgb.png) | ![](./assets/google-objects/point_5_view_2_domain_rgb_new.png) |![](./assets/blendedMVG/point_85_view_0_domain_rgb.png) | ![](./assets/hypersim/point_85_view_0_domain_rgb.png) |
+| ![](./assets/taskonomy/point_202_view_5_domain_rgb.png) | ![](./assets/google-objects/point_5_view_2_domain_rgb_new.png) | ![](./assets/hypersim/point_85_view_0_domain_rgb.png) |
 | ![](./assets/taskonomy/point_202_view_5_domain_reshading.png) | ![](./assets/google-objects/point_5_view_2_domain_reshading.png) | ![](./assets/hypersim/point_85_view_0_domain_reshading.png)
 
 ### 6. Principal Curvature:
@@ -208,7 +208,7 @@ To generate 3D keypoint images use the command below:
 `KEYPOINT_SUPPORT_SIZE` specifies the diameter of the sphere around each 3D point that is used to decide if the point should be a keypoint. 0.3 meters is suggested for indoor spaces.
 
 | Replica | Clevr | Hypersim  | BlendedMVG  |
-| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| :-------------: |:-------------:|:-------------:|:-------------:|
 | ![](./assets/replica/point_47_view_25_domain_rgb.png) | ![](./assets/clevr/point_2368_view_0_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png) | ![](./assets/blendedMVG/point_4_view_0_domain_rgb.png) |
 | ![](./assets/replica/point_47_view_25_domain_keypoints3d.png) | ![](./assets/clevr/point_2368_view_0_domain_keypoints3d.png) | ![](./assets/hypersim/point_85_view_0_domain_keypoints3d.png) | ![](./assets/blendedMVG/point_4_view_0_domain_keypoints3d.png)
 
