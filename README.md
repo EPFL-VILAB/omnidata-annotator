@@ -256,6 +256,7 @@ You can specify the weights for each of the `occlusion edges`, `depth zbuffer`, 
 
 | Replica | Google Objects | Hypersim |
 | :-------------: |:-------------:|:-------------:|
+|<img width=200/>|<img width=200/>|<img width=300/>|
 | ![](./assets/replica/point_300_view_0_domain_rgb.png) | ![](./assets/google-objects/point_21_view_5_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png)|
 | ![](./assets/replica/point_300_view_0_domain_segment_unsup25d.png) | ![](./assets/google-objects/point_21_view_5_domain_segment_unsup25d.png) | ![](./assets/hypersim/point_85_view_0_domain_segment_unsup25d.png) 
 
