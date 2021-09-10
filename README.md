@@ -150,7 +150,7 @@ ZBuffer depth is defined as the distance to the camera plane. The depth sensitiv
 | Replica | Google Objects  | Hypersim  | BlendedMVG  |
 | :-------------:|:-------------:|:-------------:|:-------------:|
 | ![](./assets/replica/point_156_view_10_domain_rgb.png) | ![](./assets/google-objects/point_21_view_5_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_rgb.png) |
-| ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/replica-gso/point_21_view_5_domain_depth_zbuffer.png)|![](./assets/hypersim/point_85_view_0_domain_depth_zbuffer2.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_depth_zbuffer.png)
+| ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/google-objects/point_21_view_5_domain_depth_zbuffer.png)|![](./assets/hypersim/point_85_view_0_domain_depth_zbuffer2.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_depth_zbuffer.png)
 
 
 ### 4. Depth Euclidean:
@@ -187,7 +187,7 @@ To generate principal curvature run:
 ```
 
 | Taskonomy | Replica |
-| :-------------:|:-------------:|
+| :---:|:---:|
 | ![](./assets/taskonomy/point_202_view_5_domain_rgb.png) | ![](./assets/replica/point_0_view_2_domain_rgb.png) |
 | ![](./assets/taskonomy/point_202_view_5_domain_principal_curvature.png) | ![](./assets/replica/point_0_view_2_domain_principal_curvature.png) 
 
