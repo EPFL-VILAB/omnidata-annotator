@@ -1,0 +1,136 @@
+./taskonomizer.sh --model_path=/scratch/ainaz/habitat-sim/data/objects/shapeNet/ --task=scale with OBJ_DENSITY=2
+
+apt-get install -y --no-install-recommends libjpeg-dev libglm-dev libgl1-mesa-glx libegl1-mesa-dev mesa-utils xorg-dev freeglut3-dev
+
+bash jobs_habitat2/rgb_train.sh --startwith=0061
+bash jobs_habitat2/rgb_train000.sh --startwith=000 --continue=63 --end=63
+bash jobs_habitat2/rgb_train.sh --startwith=001 --continue=168 --end=199
+
+
+bash jobs_habitat2/depthe_train.sh --startwith=002 --continue=265 --end=265
+bash jobs_habitat2/depthz_train000.sh --startwith=000 --continue=15 --end=15
+
+bash jobs_habitat2/reshading_train.sh --startwith=007 --continue=714 --end=799
+bash jobs_habitat2/reshading_train000.sh --startwith=000 --continue=40 --end=99
+
+
+bash jobs_habitat2/depthz_train2.sh --startwith=001 --continue=130 --end=130
+bash jobs_habitat2/normal_train2.sh --startwith=000 --continue=00 --end=00
+
+bash jobs_habitat2/keypoints3d_val.sh --startwith=008 --continue=841 --end=899
+bash jobs_habitat2/keypoints3d_train.sh --startwith=007 --continue=777 --end=777
+bash jobs_habitat2/keypoints3d_train000.sh --startwith=000 --continue=00 --end=99
+bash jobs_habitat2/keypoints3d_train.sh --startwith=002 --continue=272 --end=272
+bash jobs_habitat2/keypoints3d_train.sh --startwith=002 --continue=200 --end=299
+bash jobs_habitat2/keypoints3d_train.sh --startwith=001 --continue=100 --end=799
+
+
+bash jobs_habitat2/keypoints3d_val.sh
+
+bash jobs_habitat2/edge3D_train.sh
+
+
+
+
+
+bash jobs_habitat2/rgb_val.sh
+
+apt-get update
+apt-get install screen
+apt-get install wget
+wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh
+bash Miniconda3-py38_4.10.3-Linux-x86_64.sh
+source ~/.bashrc
+conda create -n habitat python=3.6 cmake=3.14.0
+conda activate habitat
+cd /scratch-data/ainaz/habitat-sim
+pip install -r requirements.txt
+apt-get update || true
+apt-get install -y --no-install-recommends libjpeg-dev libglm-dev libgl1-mesa-glx libegl1-mesa-dev mesa-utils xorg-dev freeglut3-dev
+python setup.py install --headless
+pip install torch pytransform3d natsort
+
+
+'03790512',
+ '02924116',
+ '04554684',
+ '04379243',
+ '03207941',
+ '02880940',    done (1)
+ '04074963',    done
+ '02871439',    done
+ '04256520',    done
+ '03691459',    done
+ '04090263',
+ '03261776',
+ '02747177',
+ '03928116',
+ '03467517',
+ '03938244',
+ '03593526',
+ '02818832',
+ '02876657',
+ '02691156',
+ '03710193',
+ '03046257',
+ '03001627',
+ '03085013',
+ '03211117',
+ '02808440',    done (5)
+ '04330267',    done
+ '03761084',    done
+ '04468005',    done
+ '04225987',    done
+ '02942699',    done (6)
+ '03337140',    done
+ '04460130',    done
+ '02992529',    done
+ '03991062',    done
+ '02954340',
+ '02843684',
+ '04401088',
+ '04004475',
+ '04530566',
+ '03797390',    done (8)
+ '03513137',    done
+ '03624134',    done
+ '02801938',    done
+ '03325088',    done
+ '02773838',    done (9)
+ '03642806',    done
+ '03948459',    done
+ '03636649',    done
+ '04099429',    done
+ '02946921',
+ '02828884',
+ '02958343',
+ '03759954',
+ '02933112'
+
+
+ ./omnidata-annotate.sh --model_path=/scratch-data/ainaz/omnidata-release/sample-model/room_0/ --task=rgb_UV with MODEL_FILE=mesh.ply  CREATE_FIXATED=True
+
+
+ ./omnidata-annotate.sh --model_path=/model/TEA_SET/ --task=rgb_UV   with MODEL_FILE=model.obj  CREATE_FIXATED=True          USE_TEXTURE=True     TEXTURE_FILE=texture.png
+
+
+
+ ./omnidata-annotate.sh --model_path=/scratch-data/ainaz/omnidata-release/sample-model/room_0/ --task=reshading \
+    with MODEL_FILE=mesh.ply  LAMP_ENERGY=2.5
+
+./omnidata-annotate.sh --model_path=/scratch-data/ainaz/omnidata-release/sample-model/room_0/ --task=curvature with MIN_CURVATURE_RADIUS=0.03
+
+./omnidata-annotate.sh --model_path=/scratch-data/ainaz/omnidata-release/sample-model/TEA_SET/ --task=points \
+  with GENERATE_CAMERAS=True    SCENE=False \
+       NUM_CAMERAS=12           MAX_CAMERA_ROLL=10 \
+       POINTS_PER_CAMERA=5      MIN_VIEWS_PER_POINT=3 \
+       MODEL_FILE=model.obj     SPHERE_SCALING_FACTOR=2
+
+
+./omnidata-annotate.sh --model_path=/scratch-data/ainaz/omnidata-release/sample-model/room_0/ --task=curvature with MIN_CURVATURE_RADIUS=0.03
+
+./omnidata-annotate.sh --model_path=/model/TEA_SET --task=points \
+  with GENERATE_CAMERAS=True    SCENE=False \
+       NUM_CAMERAS=12           MAX_CAMERA_ROLL=10 \
+       POINTS_PER_CAMERA=5      MIN_VIEWS_PER_POINT=3 \
+       MODEL_FILE=model.obj     SPHERE_SCALING_FACTOR=2
