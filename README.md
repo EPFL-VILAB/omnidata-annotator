@@ -1,6 +1,7 @@
 # Snowball Annotator
 
 
+![](./assets/point_5.gif)
 
 ## Installation
 We provide a docker that contains the code and all the necessary libraries. It's simple to install and run.
