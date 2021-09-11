@@ -145,7 +145,7 @@ To generate depth zbuffer images :
 ./omnidata-annotate.sh --model_path=/usr/omnidata-annotator/frl_apartment_0 --task=depth_zbuffer \
     with MODEL_FILE=mesh.ply  DEPTH_ZBUFFER_MAX_DISTANCE_METERS=16
 ```
-ZBuffer depth is defined as the distance to the camera plane. The depth sensitivity is specified by the maximum depth in meters. With 16-bit images and `DEPTH_ZBUFFER_MAX_DISTANCE_METERS` equal to 16m, the depth sensitivity will be 16 / 2**16 = 1/4096 meters.
+ZBuffer depth is defined as the distance to the camera plane. The depth sensitivity is specified by the maximum depth in meters. With 16-bit images and `DEPTH_ZBUFFER_MAX_DISTANCE_METERS` equal to 16m, the depth sensitivity will be 16 / 2^16 = 1/4096 meters. Pixels with maximum depth value (2^16) indicate the invalid parts of the image (such as mesh holes).
 
 | Replica | Google Objects  | Hypersim  | BlendedMVG  |
 | :-------------:|:-------------:|:-------------:|:-------------:|
