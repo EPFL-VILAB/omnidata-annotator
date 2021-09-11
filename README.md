@@ -1,6 +1,6 @@
 # Snowball Annotator
 
-<video src='./assets/point_5.mp4' width=180/>
+
 
 ## Installation
 We provide a docker that contains the code and all the necessary libraries. It's simple to install and run.
