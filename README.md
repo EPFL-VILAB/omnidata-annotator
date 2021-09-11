@@ -184,7 +184,7 @@ ZBuffer depth is defined as the distance to the camera plane. The depth sensitiv
 | :-------------:|:-------------:|:-------------:|:-------------:|
 | ![](./assets/replica/point_156_view_10_domain_rgb.png) | ![](./assets/google-objects/point_21_view_5_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_rgb.png) |
 | ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/google-objects/point_21_view_5_domain_depth_zbuffer.png)|![](./assets/hypersim/point_85_view_0_domain_depth_zbuffer2.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_depth_zbuffer.png) |
-| ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/google-objects/point_21_view_5_domain_mask_valid.png)|![](./assets/hypersim/point_85_view_0_domain_mask_valid.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_mask_valid.png)
+| ![](./assets/replica/point_156_view_10_domain_mask_valid.png) | ![](./assets/google-objects/point_21_view_5_domain_mask_valid.png)|![](./assets/hypersim/point_85_view_0_domain_mask_valid.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_mask_valid.png)
 
 
 ### 5. Depth Euclidean:
