@@ -25,7 +25,7 @@ Table of Contents
 
 
 ## Introduction 
-The Omnidata annotator is a pipeline to bridge the gap between 3D scans and static vision datasets by generating multi-task datasets with 21 different mid-level cues from 3D meshes. It generates the data with as many images and cameras as desired to cover the space. The rendering pipeline offers complete control over the sampling and generation process, and different dataset design choices such as camera parameters. 13 of the 21 mid-level cues are listed below:
+The Omnidata annotator is a pipeline to bridge the gap between 3D scans and static vision datasets by creating "steerable" multi-task datasets with 21 different mid-level cues from 3D meshes. It generates the data with as many images and cameras as desired to cover the space. The rendering pipeline offers complete control over the sampling and generation process, and different dataset design choices such as camera parameters. 13 of the 21 mid-level cues are listed below:
 ```bash
 RGB (8-bit)              Surface Normals (8-bit)     Principal Curvature (8-bit)
 Re(shading) (8-bit)      Depth Z-Buffer (16-bit)     Depth Euclidean (16-bit)
@@ -43,27 +43,29 @@ git clone https://github.com/Ainaz99/omnidata-annotator
 ```
 2. Run the Docker and mount the directories containing the code and your 3D model in the container: 
 ```bash
-docker pull omnidata-annotator
-docker run -ti --rm -v PATH_TO_ANNOTATOR:/annotator -v PATH_TO_3D_MODEL:/model omnidata-annotator:latest
+docker pull ainaz99/omnidata-annotator:latest
+docker run -ti --rm -v PATH_TO_ANNOTATOR:/annotator -v PATH_TO_3D_MODEL:/model ainaz99/omnidata-annotator:latest
 ```
 The code for the annotator and the 3D model are now available in the docker under the directories `/annotator` and `/model` respectively. All the necessary libraries and softwares are already installed in the docker. Now, the model can be processed with a single line of bash inside the container.
 
 
 ## Quickstart (run demo)
+Next, we show how to run the pipeline on a sample 3D mesh from the Habitat-Matterport 3D datast. You can download it from [here](https://drive.google.com/file/d/1B1Zxur6ywvpOpfQb49CQB_yW7jj4Ynnk/view?usp=sharing). After running the docker container, the mesh will be available under the `/model` directory.
+
 | Surface Normals | Euclidean Depth | Semantics  |
 | :-------------: |:-------------:| :-----:|
 | ![](./assets/replica/point_0009_view_equirectangular_domain_normal.png) | ![](./assets/replica/point_0009_view_equirectangular_domain_depth_euclidean.png) | ![](./assets/replica/point_0009_view_equirectangular_domain_semantic.png) |
 | ![](./assets/replica/point_0010_view_equirectangular_domain_normal.png) | ![](./assets/replica/point_0010_view_equirectangular_domain_depth_euclidean.png) | ![](./assets/replica/point_0010_view_equirectangular_domain_semantic.png)
 
 
-Next, we show how to generate the mid-level cues from a sample 3D mesh available under the `/model` directory inside the container:
+
 **To generate a specific mid-level cue with the Omnidata annotator, use a single command in the format below:**
 ``` bash
 cd /annotator
 ./omnidata-annotate.sh --model_path=/model --task=$TASK with {$SETTING=$VALUE}*
 ```
 The `--model_path` tag specifies the path to the folder containing the mesh, where the data from all other mid-level cues will be saved, and the `--task` tag specifies the target mid-level cue.
-You can specify different setting values for each task in the command. The list of all settings defined for different mid-level cues is found in `settings.py`.
+You can specify different setting values for each task in the command. The list of all settings defined for different mid-level cues is found in `scripts/settings.py`.
 
 The final folder structure will be as follows:
 ```bash
@@ -91,11 +93,11 @@ Now, we run the annotator for different tasks.
 Camera poses can be provided by a `json` file (if the mesh comes with aligned RGB), or you can generate dense camera locations using the pipeline with `Poisson Disc Sampling`. Points-of-interest are then sampled from the mesh subject to multi-view constraints.
 
 #### Read camera poses from json file:
-The following command samples 100 points-of-interest using the camera poses defined in `camera_poses.json`.
+The following command samples 20 points-of-interest using the camera poses defined in `camera_poses_original.json`.
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=points \
-   with GENERATE_CAMERAS=False CAMERA_POSE_FILE=camera_poses.json \
-        MIN_VIEWS_PER_POINT=3  NUM_POINTS=100 \
+   with GENERATE_CAMERAS=False CAMERA_POSE_FILE=camera_poses_original.json \
+        MIN_VIEWS_PER_POINT=3  NUM_POINTS=20 \
         MODEL_FILE=mesh.ply    POINT_TYPE=CORRESPONDENCES
 ```
 In order to read the camera poses from the json file, you should specify `GENERATE_CAMERAS=False`. This json file should contain `location` and `quaternion rotation (wxyz)` for a list of cameras. Below, you can see how this information should be saved for each camera.
@@ -119,8 +121,8 @@ In this case, you have to specify `SCENE=True`.
 ./omnidata-annotate.sh --model_path=/model --task=points \
    with GENERATE_CAMERAS=True     SCENE=True \
         MIN_CAMERA_HEIGHT=1       MAX_CAMERA_ROLL=10 \
-        MIN_CAMERA_DISTANCE=1     MIN_CAMERA_DISTANCE_TO_MESH=0.3 \
-        MIN_VIEWS_PER_POINT=3     POINTS_PER_CAMERA=5 \
+        MIN_CAMERA_DISTANCE=1.5     MIN_CAMERA_DISTANCE_TO_MESH=0.3 \
+        MIN_VIEWS_PER_POINT=3     POINTS_PER_CAMERA=3 \
         MODEL_FILE=mesh.ply       POINT_TYPE=CORRESPONDENCES
 
 ```
@@ -145,13 +147,12 @@ If the mesh is an object you have to specify `SCENE=False`. In this case, camera
 | ![](./assets/google-objects/point_11_view_0_domain_rgb.png) | ![](./assets/google-objects/point_19_view_4_domain_rgb.png) | ![](./assets/google-objects/point_21_view_0_domain_rgb.png) |![](./assets/google-objects/point_22_view_0_domain_rgb.png) | ![](./assets/google-objects/point_29_view_0_domain_rgb.png) 
 
 ### 2. RGB:
-There are several ways to generate rgb images.
-#### Generate rgb images using texture UV map:
-You can generate `rgb` images using texture UV maps. You should specify the texture file using `TEXTURE_FILE`.
+RGB images can be generated if textures are provided as obj + mtl files. You should use `mesh.obj` instead of the `ply` file. MAke sure to set the correct `OBJ_AXIS_FORWARD` and `OBJ_AXIS_UP` to be consistent with `mesh.ply`.
+
 ```bash
-./omnidata-annotate.sh --model_path=/model --task=rgb_UV \
-    with MODEL_FILE=mesh.ply  CREATE_FIXATED=True \
-         USE_TEXTURE=True     TEXTURE_FILE=texture.png
+./omnidata-annotate.sh --model_path=/model --task=rgb \
+    with MODEL_FILE=mesh.obj  CREATE_FIXATED=True \
+         OBJ_AXIS_FORWARD=Y   OBJ_AXIS_UP=Z  
 ```
 |  |  |  |  | 
 | :-------------: |:-------------:|:-------------:|:-------------:|
@@ -173,19 +174,33 @@ This will generate fixated views.
 | ![](./assets/replica/point_246_view_34_domain_rgb.png) | ![](./assets/clevr/point_55_view_0_domain_rgb.png) | ![](./assets/google-objects/point_28_view_1_domain_rgb.png) |![](./assets/replica-gso/point_754_view_16_domain_rgb.png) | ![](./assets/blendedMVG/00000253.jpg) |
 | ![](./assets/replica/point_246_view_34_domain_normal.png) | ![](./assets/clevr/point_55_view_0_domain_normal.png) | ![](./assets/google-objects/point_28_view_1_domain_normal.png)|![](./assets/replica-gso/point_754_view_16_domain_normal.png) | ![](./assets/blendedMVG/point_253_view_0_domain_normal.png)
 
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_39_view_2_domain_normal.png) | ![](./assets/hm3d/point_52_view_0_domain_normal.png) | ![](./assets/hm3d/point_47_view_0_domain_normal.png) | ![](./assets/hm3d/point_42_view_2_domain_normal.png)  | ![](./assets/hm3d/point_8_view_0_domain_normal.png) 
 
 In case you want to generate panoramas switch to `CREATE_FIXATED=False`  and `CREATE_PANOS=True`:
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=normal \
     with MODEL_FILE=mesh.ply CREATE_FIXATED=False CREATE_PANOS=True
 ```
-![](/home/ainaz/Desktop/EPFL/replica_apartment_0/pano/normal/point_0019_view_equirectangular_domain_normal.png)
+
+```diff
+- HM3D Output:
+```
+
+|  |  |  |
+| :-------------: |:-------------:|:-------------:|
+| ![](./assets/hm3d/point_0036_view_equirectangular_domain_normal.png) | ![](./assets/hm3d/point_0024_view_equirectangular_domain_normal.png) | ![](./assets/hm3d/point_0045_view_equirectangular_domain_normal.png) 
+
 
 ### 4. Depth ZBuffer:
 To generate depth zbuffer images :
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=depth_zbuffer \
-    with MODEL_FILE=mesh.ply  DEPTH_ZBUFFER_MAX_DISTANCE_METERS=16
+    with MODEL_FILE=mesh.ply  DEPTH_ZBUFFER_MAX_DISTANCE_METERS=8
 ```
 ZBuffer depth is defined as the distance to the camera plane. The depth sensitivity is specified by the maximum depth in meters. With 16-bit images and `DEPTH_ZBUFFER_MAX_DISTANCE_METERS` equal to 16m, the depth sensitivity will be 16 / 2^16 = 1/4096 meters. Pixels with maximum depth value (2^16) indicate the invalid parts of the image (such as mesh holes). You can create masks indicating the valid parts of each image after generating depth Zbuffer images using the following command (these masks are shown in the 3rd row of the table below):
 ```bash
@@ -198,12 +213,18 @@ ZBuffer depth is defined as the distance to the camera plane. The depth sensitiv
 | ![](./assets/replica/point_156_view_10_domain_depth_zbuffer.png) | ![](./assets/google-objects/point_21_view_5_domain_depth_zbuffer.png)|![](./assets/hypersim/point_85_view_0_domain_depth_zbuffer2.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_depth_zbuffer.png) |
 | ![](./assets/replica/point_156_view_10_domain_mask_valid.png) | ![](./assets/google-objects/point_21_view_5_domain_mask_valid.png)|![](./assets/hypersim/point_85_view_0_domain_mask_valid.png) | ![](./assets/blendedMVG/point_1006_view_0_domain_mask_valid.png)
 
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_39_view_2_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_52_view_0_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_47_view_0_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_42_view_2_domain_depth_zbuffer.png)  | ![](./assets/hm3d/point_8_view_0_domain_depth_zbuffer.png) 
 
 ### 5. Depth Euclidean:
 To generate depth euclidean images :
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=depth_euclidean \
-    with MODEL_FILE=mesh.ply  DEPTH_EUCLIDEAN_MAX_DISTANCE_METERS=16
+    with MODEL_FILE=mesh.ply  DEPTH_EUCLIDEAN_MAX_DISTANCE_METERS=8
 ```
 Euclidean depth is measured as the distance from each pixel to the camera’s optical center. You can specify depth sensitivity the same as depth Zbuffer.
 
@@ -225,6 +246,14 @@ To generate reshading images :
 | ![](./assets/taskonomy/point_202_view_5_domain_rgb.png) | ![](./assets/google-objects/point_5_view_2_domain_rgb_new.png) | ![](./assets/hypersim/point_85_view_0_domain_rgb.png) |
 | ![](./assets/taskonomy/point_202_view_5_domain_reshading.png) | ![](./assets/google-objects/point_5_view_2_domain_reshading.png) | ![](./assets/hypersim/point_85_view_0_domain_reshading.png)
 
+
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_39_view_2_domain_reshading.png) | ![](./assets/hm3d/point_52_view_0_domain_reshading.png) | ![](./assets/hm3d/point_47_view_0_domain_reshading.png) | ![](./assets/hm3d/point_42_view_2_domain_reshading.png)  | ![](./assets/hm3d/point_8_view_0_domain_reshading.png) 
+
 ### 7. Principal Curvature:
 To generate principal curvature run:
 
@@ -236,6 +265,11 @@ To generate principal curvature run:
 | :---:|:---:|
 | ![](./assets/taskonomy/point_202_view_5_domain_rgb.png) | ![](./assets/replica/point_0_view_2_domain_rgb.png) |
 | ![](./assets/taskonomy/point_202_view_5_domain_principal_curvature.png) | ![](./assets/replica/point_0_view_2_domain_principal_curvature.png) 
+
+```diff
+- HM3D Output:
+```
+Not working for HM3D meshes!
 
 ### 8. Keypoints 2D:
 2D keypoints are generated from corresponding `RGB` images for each point and view. You can generate 2D keypoint images using the command below :
@@ -258,6 +292,12 @@ To generate 3D keypoint images use the command below:
 | ![](./assets/replica/point_47_view_25_domain_rgb.png) | ![](./assets/clevr/point_2368_view_0_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png) | ![](./assets/blendedMVG/point_4_view_0_domain_rgb.png) |
 | ![](./assets/replica/point_47_view_25_domain_keypoints3d.png) | ![](./assets/clevr/point_2368_view_0_domain_keypoints3d.png) | ![](./assets/hypersim/point_85_view_0_domain_keypoints3d.png) | ![](./assets/blendedMVG/point_4_view_0_domain_keypoints3d.png)
 
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_39_view_2_domain_keypoints3d.png) | ![](./assets/hm3d/point_52_view_0_domain_keypoints3d.png) | ![](./assets/hm3d/point_47_view_0_domain_keypoints3d.png) | ![](./assets/hm3d/point_42_view_2_domain_keypoints3d.png)  | ![](./assets/hm3d/point_8_view_0_domain_keypoints3d.png) 
 
 ### 10. Texture Edges:
 Texture(2D) Edges are computed from corresponding `RGB` images using **Canny edge detection** algorithm. To generate 2D edges:
@@ -305,6 +345,14 @@ You can specify the weights for each of the `occlusion edges`, `depth zbuffer`, 
 |<img width=50/>|<img width=50/>|<img width=50/>|
 | ![](./assets/replica/point_300_view_0_domain_rgb.png) | ![](./assets/google-objects/point_21_view_5_domain_rgb.png) |![](./assets/hypersim/point_85_view_0_domain_rgb.png)|
 | ![](./assets/replica/point_300_view_0_domain_segment_unsup25d.png) | ![](./assets/google-objects/point_21_view_5_domain_segment_unsup25d.png) | ![](./assets/hypersim/point_85_view_0_domain_segment_unsup25d.png) 
+
+
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_39_view_2_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_52_view_0_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_47_view_0_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_42_view_2_domain_segment_unsup25d.png)  | ![](./assets/hm3d/point_8_view_0_domain_segment_unsup25d.png) 
 
 ### 14. Semantic Segmentation:
 Semantic segmentation images can be generated fomr meshes with face colors. These colors should be saved as a face property named `color` in the `.ply` file.
