@@ -101,10 +101,6 @@ def main():
         for point_number, point_info in enumerate(point_infos):
             for view_num, view_of_point in enumerate(point_info):
                 point, view = view_of_point['point_uuid'], view_of_point['view_id']
-                if os.path.exists(
-                    os.path.join(basepath, TASK_NAME, 'point_{}_view_{}_domain_{}.png'.format(point, view, TASK_NAME))):
-                    print(point, view, "********************************************************existss!!!!!")
-                    continue
                 views_of_point.append((view_of_point['view_id'], view_of_point))
         # Run them from the threadpool
         for output in p.imap(process_view, views_of_point):

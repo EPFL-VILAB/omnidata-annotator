@@ -8,7 +8,7 @@ model_path=$1
 cd $model_path
 
 # Clear the directory if it exists
-# rm -rf keypoints3d
+rm -rf keypoints3d
 
 # Make it if it doesn't exist
 mkdir -p keypoints3d
