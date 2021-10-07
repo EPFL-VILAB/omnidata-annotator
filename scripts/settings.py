@@ -37,8 +37,8 @@ TILE_SIZE = 128
 PANO_RESOLUTION = (2048, 1024)
 MAX_CONCURRENT_PROCESSES = cpu_count()
 SHADE_SMOOTH = True
-OBJ_AXIS_FORWARD = '-Z'
-OBJ_AXIS_UP = 'Y'     
+OBJ_AXIS_FORWARD = 'Y'
+OBJ_AXIS_UP = 'Z'     
 
 
 #############################
@@ -51,7 +51,7 @@ SCENE=True
 MAX_CAMERA_ROLL = 10        # in degrees
 
 # camera sampling in the building
-MIN_CAMERA_DISTANCE = 0.12   # in meters
+MIN_CAMERA_DISTANCE = 0.5   # in meters
 MIN_CAMERA_HEIGHT = 0.2       # in meters
 MAX_CAMERA_HEIGHT = 2       # in meters
 MIN_CAMERA_DISTANCE_TO_MESH = 0.1  # in meters
@@ -76,6 +76,7 @@ STOP_VIEW_NUMBER = -1   # Generate up to (and including) this many views. -1 to 
 # -----RGB -----
 USE_TEXTURE=True
 TEXTURE_FILE = 'texture.png'
+TEXTURE_FOLDER = 'textures'
 
 # -----Color and depth -----
 BLENDER_VERTEX_COLOR_BIT_DEPTH = 8
