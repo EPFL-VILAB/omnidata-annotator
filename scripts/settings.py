@@ -36,7 +36,7 @@ SENSOR_WIDTH = 20                       #32:clevr , 20:all
 TILE_SIZE = 128
 PANO_RESOLUTION = (2048, 1024)
 MAX_CONCURRENT_PROCESSES = cpu_count()
-SHADE_SMOOTH = True
+SHADE_SMOOTH = False
 OBJ_AXIS_FORWARD = 'Y'
 OBJ_AXIS_UP = 'Z'     
 
