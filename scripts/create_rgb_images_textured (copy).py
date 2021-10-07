@@ -53,22 +53,64 @@ def main():
 
     model = io_utils.import_mesh(basepath)
 
-    print("!!!!!!!!!!!!!!!!!!!!", bpy.context.object.data.materials)
-    print("********************", bpy.data.materials)
-
-
-
     if settings.CREATE_PANOS:
         engine='CYCLES'
     else:
         engine = 'BI'
 
-    # engine='CYCLES'
-    bpy.context.scene.render.engine = 'BLENDER_RENDER'
-
-    add_face_materials(engine, model)
+    # add_face_materials(engine, model)
 
     point_infos = io_utils.load_saved_points_of_interest(basepath)
+
+    ########################3
+    bpy.context.scene.objects.active = model
+    model.select = True
+    mat = bpy.data.materials.new('material_1')
+    model.active_material = mat
+    mat.use_vertex_color_paint = True
+    bpy.ops.paint.vertex_paint_toggle()
+
+    scn = bpy.context.scene
+    if len(bpy.context.active_object.data.materials) == 0:
+        bpy.context.active_object.data.materials.append(bpy.data.materials['Material'])
+        print("!!!! if")
+    else:
+        bpy.context.active_object.data.materials[0] = bpy.data.materials['Material']
+        print("!!!! else")
+
+    # scn.render.alpha_mode = 'TRANSPARENT'
+    # bpy.data.worlds["World"].light_settings.use_ambient_occlusion = True
+
+    #####################3333
+    # print("!!!!!!!!!!!!1 ", model.name)
+    # # model.select_set(True)
+    # # bpy.data.objects[model.name].select_set(True)
+    # bpy.ops.paint.vertex_paint_toggle()
+
+    # #bpy.context.area.ui_type = 'ShaderNodeTree'
+
+    # #bpy.ops.material.new()
+
+    # mat = bpy.data.materials.get("Material")
+    # print("!!!!!!!!!!!!! mar: ", mat)
+
+    # if len(bpy.context.active_object.data.materials) == 0:
+    #     bpy.context.active_object.data.materials.append(bpy.data.materials['Material'])
+    #     print("!!!! if")
+    # else:
+    #     bpy.context.active_object.data.materials[0] = bpy.data.materials['Material']
+    #     print("!!!! else")
+
+    # if mat:
+    #     bpy.context.scene.use_nodes = True
+    #     mat.node_tree.nodes.new("ShaderNodeVertexColor")
+    #     mat.node_tree.links.new(mat.node_tree.nodes[2].outputs['Color'], mat.node_tree.nodes[1].inputs['Base Color'])
+
+
+    # # bpy.context.scene.render.filepath = '~/Desktop/photos/img.jpg'
+    # # bpy.context.scene.render.engine = 'CYCLES'
+    # # bpy.ops.render.render('INVOKE_DEFAULT', write_still=True)
+    ############################
 
     # render + save
     for point_info in point_infos:
@@ -85,27 +127,7 @@ def main():
                     break  # we only want to create 1 pano per camera
 
 
-def create_texture_from_img(filepath):
-    """
-      Creates a texture of the given image.
 
-      Args:
-        filepath: A string that contains the path to the Image
-
-      Returns:
-        texture: A texture that contains the given Image
-    """
-    texture = bpy.data.textures.new("ImageTexture", type='IMAGE')
-    img = bpy.data.images.load(filepath)
-    texture.image = img
-    # To bleed the img over the seams
-    texture.extension = 'EXTEND'
-    # For sharp edges
-    texture.use_mipmap = False
-    texture.use_interpolation = False
-    #   texture.filter_type = 'BOX'
-    texture.filter_size = 0.80
-    return texture
 
 def add_face_materials(engine, mesh):
     """
@@ -114,25 +136,22 @@ def add_face_materials(engine, mesh):
         model: The model in context after loading the .ply
         engine: The render engine
     """
+    texture_image = bpy.data.images.load(os.path.join(basepath, settings.TEXTURE_FILE))
+    image_texture = bpy.data.textures.new('export_texture', type = 'IMAGE')
+    image_texture.image = texture_image
+    image_material = bpy.data.materials.new('TextureMaterials')
+    image_material.use_shadeless = True
+
+    material_texture = image_material.texture_slots.add()
+    material_texture.texture = image_texture
+    material_texture.texture_coords = 'UV'
+    bpy.ops.object.mode_set(mode='OBJECT')
     context_obj = bpy.context.object
     context_obj_data = context_obj.data
-    bpy.context.scene.objects.active = context_obj
-
-    # texture_image = bpy.data.images.load(os.path.join(basepath, settings.TEXTURE_FILE))
-
-    for idx, mat in enumerate(bpy.data.materials):
-        mat_name = mat.name
-        if not mat_name.endswith('.jpg') and not mat_name.endswith('.png'): continue
-        texture = create_texture_from_img(os.path.join(basepath, mat_name))
-        material = utils.create_material_with_texture(texture, name=mat_name)
-        material.use_shadeless = True
-        bpy.ops.object.mode_set(mode='OBJECT')
-        context_obj_data.materials.append(material)
-
+    context_obj_data.materials.append(image_material)
     bpy.types.SpaceView3D.show_textured_solid = True
 
 
-    
 
 
 '''
@@ -151,10 +170,19 @@ def render_rgb_img(scene, save_path):
     with Profiler("Render") as prf:
 
         utils.set_preset_render_settings(scene, presets=['BASE', 'NON-COLOR'])
-        render_save_path = setup_scene_for_rgb_render(scene, save_path_dir)
+        # render_save_path = setup_scene_for_rgb_render(scene, save_path_dir)
+
+        ident = str(uu.uuid4())
+        ext = utils.img_format_to_ext[settings.PREFERRED_IMG_EXT.lower()]
+        temp_filename = "{0}0001.{1}".format(ident, ext)
+        render_save_path = os.path.join(save_path_dir, temp_filename)
+
         prf.step("Setup")
 
-        bpy.ops.render.render()
+        print("******************* ", render_save_path, save_path)
+        scene.render.filepath = os.path.join(temp_filename)
+
+        bpy.ops.render.render(write_still=True)
         prf.step("Render")
 
     with Profiler("Saving") as prf:
@@ -210,6 +238,3 @@ def setup_scene_for_rgb_render(scene, outdir):
 if __name__ == '__main__':
     with Profiler("create_rgb_images.py"):
         main()
-
-
-# ./omnidata-annotate.sh --model_path=/model --task=rgb_UV with MODEL_FILE=TEEsavR23oF.obj
