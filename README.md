@@ -421,5 +421,5 @@ ffmpeg -y -framerate 22 -pattern_type glob \
 
 |  |  |  |
 | :-------------: |:-------------:| :-----:|
-| ![](./assets/hm3d/point_0009_view_equirectangular_domain_normal.png) | ![](./assets/hm3d/point_0009_view_equirectangular_domain_depth_euclidean.png) | ![](./assets/hm3d/point_0009_view_equirectangular_domain_semantic.png) |
-| ![](./assets/hm3d/point_0010_view_equirectangular_domain_normal.png) | ![](./assets/hm3d/point_0010_view_equirectangular_domain_depth_euclidean.png) | ![](./assets/hm3d/point_0010_view_equirectangular_domain_semantic.png)
+| ![](./assets/hm3d/point_4_normal.gif) | ![](./assets/hm3d/point_0_normal.gif) | ![](./assets/hm3d/point_1_normal.gif) |
+| ![](./assets/hm3d/point_4_depth_zbuffer.gif) | ![](./assets/hm3d/point_0_depth_zbuffer.gif) | ![](./assets/hm3d/point_1_depth_zbuffer.gif)
