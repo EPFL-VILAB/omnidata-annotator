@@ -18,8 +18,8 @@ case $task in
   depth_euclidean)
     bash jobs/create_depth_euclidean_images_job.sh $model_path $args
     ;;
-  rgb_UV)
-    bash jobs/create_rgb_images_UV_map_job.sh $model_path $args
+  rgb)
+    bash jobs/create_rgb_images_obj_mtl_job.sh $model_path $args
     ;;
   rgb_textured)
     bash jobs/create_rgb_images_textured_job.sh $model_path $args
