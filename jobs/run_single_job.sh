@@ -63,7 +63,7 @@ case $task in
   mask_valid)
     bash jobs/create_mask_valid_job.sh $model_path $args
     ;;
-  points_traj)
+  points_trajectory)
     bash jobs/generate_points_smooth_traj_job.sh $model_path $args
     ;;
   ply)

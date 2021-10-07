@@ -57,7 +57,7 @@ RUN rm -rf /usr/local/blender/$BLENDER_MAJOR/python/lib/python3.5/site-packages/
 RUN cd /usr/local/blender/$BLENDER_MAJOR/python/bin \
     && ./python3.5m -m ensurepip \
     && ./python3.5m -m pip install numpy --upgrade \
-    && ./python3.5m -m pip install trimesh natsort==7.0.1 networkx==2.1 scipy==1.1.0 opencv-python==3.1.0 scikit-image transforms3d plyfile meshlabxml pytransform3d
+    && ./python3.5m -m pip install trimesh natsort==7.0.1 networkx==2.1 scipy==1.2.0 opencv-python==3.1.0 scikit-image transforms3d plyfile meshlabxml pytransform3d
 
 #########################################
 # Install MeshLab and Point Cloud Library
@@ -69,6 +69,7 @@ RUN cd /usr/local/blender/$BLENDER_MAJOR/python/bin \
           valgrind \
           meshlab \
           xvfb \
+          ffmpeg \
       && rm -rf /var/lib/apt/lists/*
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libvtkCommonCore-6.2.so /usr/lib/libvtkproj4.so

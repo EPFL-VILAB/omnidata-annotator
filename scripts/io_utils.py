@@ -230,7 +230,10 @@ def get_file_name_for(dir, point_uuid, view_number, camera_uuid, task, ext):
         camera_uuid: An identifier for the camera
         ext: The file extension to use
     """
-    view_specifier = view_number
+    if settings.CREATE_TRAJECTORY:
+        view_specifier = str(view_number).zfill(4)
+    else:
+        view_specifier = view_number
     filename = "point_{0}_view_{1}_domain_{2}.{3}".format(point_uuid, view_specifier, task, ext)
     return os.path.join(dir, filename)
 

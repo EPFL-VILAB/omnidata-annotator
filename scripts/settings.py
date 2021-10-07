@@ -14,6 +14,7 @@ import sys
 # -----Images -----
 CREATE_FIXATED = True
 CREATE_PANOS = False
+CREATE_TRAJECTORY = False
 PANO_VIEW_NAME = 'equirectangular'
 PREFERRED_IMG_EXT = 'PNG'  
 

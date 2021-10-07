@@ -223,6 +223,9 @@ def create_smooth_trajectory(point_datas):
             if t in key_times: 
                 cur_point_info = key_point_data.pop(0)
                 cur_point_info_copy = cur_point_info.copy()
+                cur_point_info_copy['fixated'] = True
+                cur_point_info_copy['line_of_sight'] = True
+
             else:
                 cur_point_info_copy = cur_point_info.copy()
                 cur_point_info_copy['camera_location'] = tuple(list(interp_locs[t]))
@@ -230,6 +233,26 @@ def create_smooth_trajectory(point_datas):
                 cur_point_info_copy['camera_rotation_original'] = tuple(list(interp_rots[t]))
                 cur_point_info_copy['camera_rotation_from_original_to_final'] = [0,0,0]
                 cur_point_info_copy['camera_rotation_final_quaternion'] = tuple(Euler(tuple(interp_rots[t]), 'XYZ').to_quaternion())
+                cur_point_info_copy['fixated'] = False
+                # update camera distance to point
+                cam_loc, point_loc = cur_point_info_copy['camera_location'], cur_point_info_copy['point_location']
+                camera_distance_to_point = (Vector(cam_loc) - Vector(point_loc)).magnitude
+                cur_point_info_copy['camera_distance'] = camera_distance_to_point
+                # do we have line of sight to the point?
+                los_normals_and_obliqueness = try_get_line_of_sight_obliqueness(cam_loc, Vector(point_loc))
+                if los_normals_and_obliqueness: 
+                    cur_point_info_copy['line_of_sight'] = True
+                    point_normal, camera_obliqueness = los_normals_and_obliqueness
+                else:
+                    cur_point_info_copy['line_of_sight'] = False
+                    point_normal, camera_obliqueness = (None, None)
+                # update obliqueness_angle and point_normal if we have line of sight
+                cur_point_info_copy['obliqueness_angle'] = camera_obliqueness
+                if point_normal:
+                    cur_point_info_copy['point_normal'] = tuple(list(point_normal))
+                else:
+                    cur_point_info_copy['point_normal'] = point_normal
+                    
 
             cur_point_info_copy['camera_uuid'] = str(t).zfill(4)
             new_point_data.append(cur_point_info_copy)
@@ -265,26 +288,28 @@ def generate_point_correspondences(model, camera_poses, basepath):
         point_uuids = [point_data[0]['point_uuid'] for point_data in point_datas]
 
         point_datas = create_smooth_trajectory(point_datas)
-        print("!!!!!!!!!!!!!!!!!! ", len(point_datas), len(point_datas[0]))
 
-    with Profiler("Generate nonfixated points", logger) as prf:
-        add_nonfixated_point_info(point_datas, points_list, cameras_with_view_of_point)
-        old_views_count = n_views(point_datas, min_nonfixated=0)
+        views_count = n_views(point_datas)
 
-        nonfixated_pds = make_nonfixated_point_datas(point_datas, settings.MIN_VIEWS_PER_POINT)
-        # while True:
-        #     nonfixated_pds = make_nonfixated_point_datas(point_datas, settings.MIN_VIEWS_PER_POINT)
-        #     new_pds = prune_fixated(point_datas, nonfixated_pds, points_list, settings.MIN_VIEWS_PER_POINT)
-        #     new_views_count = n_views(new_pds, min_nonfixated=1)
-        #     logger.info("Filtering: {} -> {}".format(old_views_count, new_views_count))
+    # with Profiler("Generate nonfixated points", logger) as prf:
+    #     add_nonfixated_point_info(point_datas, points_list, cameras_with_view_of_point)
+    #     old_views_count = n_views(point_datas, min_nonfixated=0)
 
-        #     if new_views_count == old_views_count:
-        #         break
-        #     old_views_count = new_views_count
-        #     point_datas = new_pds
-        logger.info("Filtering: {} -> {}".format(old_views_count, old_views_count))
+    #     nonfixated_pds = make_nonfixated_point_datas(point_datas, settings.MIN_VIEWS_PER_POINT)
+    #     # while True:
+    #     #     nonfixated_pds = make_nonfixated_point_datas(point_datas, settings.MIN_VIEWS_PER_POINT)
+    #     #     new_pds = prune_fixated(point_datas, nonfixated_pds, points_list, settings.MIN_VIEWS_PER_POINT)
+    #     #     new_views_count = n_views(new_pds, min_nonfixated=1)
+    #     #     logger.info("Filtering: {} -> {}".format(old_views_count, new_views_count))
 
-    finalize_point_datas(point_datas, nonfixated_pds, points_list, point_uuids)
+    #     #     if new_views_count == old_views_count:
+    #     #         break
+    #     #     old_views_count = new_views_count
+    #     #     point_datas = new_pds
+    #     logger.info("Filtering: {} -> {}".format(old_views_count, old_views_count))
+
+    finalize_point_datas(point_datas, points_list, point_uuids)
+    print("Generated {} points and {} views. ".format(len(point_datas), views_count))
 
     with Profiler("Saving", logger) as prf:
         for point_num, point_data in enumerate(point_datas):
@@ -296,14 +321,16 @@ def generate_point_correspondences(model, camera_poses, basepath):
         #         save_point_data(nfpd, basepath, get_point_uuid(point_num), fixated=False)
         # prf.step("nonfixated")
 
+    
 
-def make_nonfixated_point_datas(point_datas, min_views):
-    nonfixated_pds = [[] for pd in point_datas]
-    for point_num, point_data in enumerate(point_datas):
-        for view_num, view_dict in enumerate(point_data):
-            for nonfixated_neighbor in view_dict['nonfixated_points_in_view']:
-                nonfixated_pds[nonfixated_neighbor].append(view_dict)
-    return prune_nonfixated(nonfixated_pds, min_views)
+
+# def make_nonfixated_point_datas(point_datas, min_views):
+#     nonfixated_pds = [[] for pd in point_datas]
+#     for point_num, point_data in enumerate(point_datas):
+#         for view_num, view_dict in enumerate(point_data):
+#             for nonfixated_neighbor in view_dict['nonfixated_points_in_view']:
+#                 nonfixated_pds[nonfixated_neighbor].append(view_dict)
+#     return prune_nonfixated(nonfixated_pds, min_views)
 
 
 def n_cameras_in_point_data(point_data):
@@ -313,53 +340,53 @@ def n_cameras_in_point_data(point_data):
     return camera_uuids
 
 
-def prune_nonfixated(nonfixated_pds, min_views):
-    new_nonfixated_pds = [[] for pd in nonfixated_pds]
-    culled = set()
-    for point_num, point_data in enumerate(nonfixated_pds):
-        if len(n_cameras_in_point_data(point_data)) >= min_views:
-            new_nonfixated_pds[point_num] = nonfixated_pds[point_num]
-        else:
-            culled.add(point_num)
-    if culled:
-        logger.info("Nonfixated: culling points {}".format(culled))
-    return new_nonfixated_pds
+# def prune_nonfixated(nonfixated_pds, min_views):
+#     new_nonfixated_pds = [[] for pd in nonfixated_pds]
+#     culled = set()
+#     for point_num, point_data in enumerate(nonfixated_pds):
+#         if len(n_cameras_in_point_data(point_data)) >= min_views:
+#             new_nonfixated_pds[point_num] = nonfixated_pds[point_num]
+#         else:
+#             culled.add(point_num)
+#     if culled:
+#         logger.info("Nonfixated: culling points {}".format(culled))
+#     return new_nonfixated_pds
 
 
-def prune_fixated(fixated_pds, nonfixated_pds, points_list, min_views):
-    for point_num, nfpd in enumerate(nonfixated_pds):
-        if len(nfpd) < min_views:
-            points_list[point_num] = None
+# def prune_fixated(fixated_pds, nonfixated_pds, points_list, min_views):
+#     for point_num, nfpd in enumerate(nonfixated_pds):
+#         if len(nfpd) < min_views:
+#             points_list[point_num] = None
 
-    new_fixated_pds = []
-    for point_num, fpd in enumerate(fixated_pds):
-        for view_num, view_dict in enumerate(fpd):
-            for point_idx, point in enumerate(points_list):
-                if point is None and point_idx in view_dict['nonfixated_points_in_view']:
-                    view_dict['nonfixated_points_in_view'].remove(point_idx)
+#     new_fixated_pds = []
+#     for point_num, fpd in enumerate(fixated_pds):
+#         for view_num, view_dict in enumerate(fpd):
+#             for point_idx, point in enumerate(points_list):
+#                 if point is None and point_idx in view_dict['nonfixated_points_in_view']:
+#                     view_dict['nonfixated_points_in_view'].remove(point_idx)
 
-    culled = set()
-    for point_num, fpd in enumerate(fixated_pds):
-        do_keep = is_keep_point(fpd)
-        if not do_keep:
-            culled.add(point_num)
-        for view_num, view_dict in enumerate(fpd):
-            if not do_keep:
-                view_dict['nonfixated_points_in_view'] = set()
+#     culled = set()
+#     for point_num, fpd in enumerate(fixated_pds):
+#         do_keep = is_keep_point(fpd)
+#         if not do_keep:
+#             culled.add(point_num)
+#         for view_num, view_dict in enumerate(fpd):
+#             if not do_keep:
+#                 view_dict['nonfixated_points_in_view'] = set()
 
-    if culled:
-        logger.info("Fixated: culling points {}".format(culled))
-    return fixated_pds
+#     if culled:
+#         logger.info("Fixated: culling points {}".format(culled))
+#     return fixated_pds
 
 
-def finalize_point_datas(fixated_pds, nonfixated_pds, points_list, point_uuids):
+def finalize_point_datas(fixated_pds, points_list, point_uuids):
     # Make set -> list
     point_locs = []
     for point_num, fixated_pd in enumerate(fixated_pds):
         point_locs.append(fixated_pd[0]['point_location'])
         # Make set -> list for JSON save
-        for view_dict in fixated_pd:
-            view_dict['nonfixated_points_in_view'] = list(view_dict['nonfixated_points_in_view'])
+        # for view_dict in fixated_pd:
+        #     view_dict['nonfixated_points_in_view'] = list(view_dict['nonfixated_points_in_view'])
 
 
         # Only keep the points that link to a nonfixated point
@@ -370,48 +397,48 @@ def finalize_point_datas(fixated_pds, nonfixated_pds, points_list, point_uuids):
         for new_view_num, view_dict in enumerate(fixated_pds[point_num]):
             view_dict['view_id'] = new_view_num
 
-    # Make a deep copy of views
-    for point_num, point_data in enumerate(nonfixated_pds):
-        nonfixated_pds[point_num] = [copy.deepcopy(view_dict) for view_dict in point_data]
+    # # Make a deep copy of views
+    # for point_num, point_data in enumerate(nonfixated_pds):
+    #     nonfixated_pds[point_num] = [copy.deepcopy(view_dict) for view_dict in point_data]
 
-    # Adjust the model_x/y/z to be the nonfixated point
-    for point_num, point_data in enumerate(nonfixated_pds):
-        for view_num, view_dict in enumerate(point_data):
-            view_dict['point_location'] = tuple(points_list[point_num])
+    # # Adjust the model_x/y/z to be the nonfixated point
+    # for point_num, point_data in enumerate(nonfixated_pds):
+    #     for view_num, view_dict in enumerate(point_data):
+    #         view_dict['point_location'] = tuple(points_list[point_num])
 
-    # Nonfixated pds should just contain references 
-    for point_num, point_data in enumerate(nonfixated_pds):
-        if not point_data:
-            continue
-        point_data_for_nonfixated = [make_view_dict_nonfixated(view_dict) for view_dict in point_data]
-        pd = fixated_pds[point_num]
-        new_point_data = {'point_uuid': point_uuids[point_num],
-                          'point_location': point_locs[point_num],
-                          'views': point_data_for_nonfixated}
-        nonfixated_pds[point_num] = new_point_data
+    # # Nonfixated pds should just contain references 
+    # for point_num, point_data in enumerate(nonfixated_pds):
+    #     if not point_data:
+    #         continue
+    #     point_data_for_nonfixated = [make_view_dict_nonfixated(view_dict) for view_dict in point_data]
+    #     pd = fixated_pds[point_num]
+    #     new_point_data = {'point_uuid': point_uuids[point_num],
+    #                       'point_location': point_locs[point_num],
+    #                       'views': point_data_for_nonfixated}
+    #     nonfixated_pds[point_num] = new_point_data
 
 
-def make_view_dict_nonfixated(view_dict):
-    fixated_camera, fixated_camera_data, scene = utils.get_or_create_camera(
-        view_dict['camera_location'],
-        view_dict['camera_rotation_final'],
-        resolution_x=settings.RESOLUTION_X,
-        resolution_y=settings.RESOLUTION_Y,
-        field_of_view=view_dict['field_of_view_rads'],
-        camera_name="viable_point_camera")
-    nfvd = io_utils.get_nonfixated_point_data(view_dict['point_location'], fixated_camera)
-    nfvd['point_uuid'] = view_dict['point_uuid']
-    nfvd['view_id'] = view_dict['view_id']
-    nfvd['camera_uuid'] = view_dict['camera_uuid']
-    return nfvd
+# def make_view_dict_nonfixated(view_dict):
+#     fixated_camera, fixated_camera_data, scene = utils.get_or_create_camera(
+#         view_dict['camera_location'],
+#         view_dict['camera_rotation_final'],
+#         resolution_x=settings.RESOLUTION_X,
+#         resolution_y=settings.RESOLUTION_Y,
+#         field_of_view=view_dict['field_of_view_rads'],
+#         camera_name="viable_point_camera")
+#     nfvd = io_utils.get_nonfixated_point_data(view_dict['point_location'], fixated_camera)
+#     nfvd['point_uuid'] = view_dict['point_uuid']
+#     nfvd['view_id'] = view_dict['view_id']
+#     nfvd['camera_uuid'] = view_dict['camera_uuid']
+#     return nfvd
 
 
 def n_views(point_datas, min_nonfixated=0):
     count = 0
     for point_data in point_datas:
         for view_dict in point_data:
-            if len(view_dict['nonfixated_points_in_view']) >= min_nonfixated:
-                count += 1
+            # if len(view_dict['nonfixated_points_in_view']) >= min_nonfixated:
+            count += 1
     return count
 
 
@@ -427,27 +454,27 @@ def prune_point_datas(point_datas, matching, min_views):
 
 
 
-def add_nonfixated_point_info(point_datas, point_locs, cameras_with_view_of_point):
-    empty = utils.create_empty("Nonfixated", (0, 0, 0))
-    camera, camera_data, scene = utils.get_or_create_camera(
-        location=(0, 0, 0), rotation=(0, 0, 0),
-        field_of_view=settings.FIELD_OF_VIEW_MATTERPORT_RADS,
-        camera_name='camera_nonfixated')
+# def add_nonfixated_point_info(point_datas, point_locs, cameras_with_view_of_point):
+#     empty = utils.create_empty("Nonfixated", (0, 0, 0))
+#     camera, camera_data, scene = utils.get_or_create_camera(
+#         location=(0, 0, 0), rotation=(0, 0, 0),
+#         field_of_view=settings.FIELD_OF_VIEW_MATTERPORT_RADS,
+#         camera_name='camera_nonfixated')
 
-    for point_num, point_data in enumerate(point_datas):
-        for view_num, view_dict in enumerate(point_data):
-            view_dict['nonfixated_points_in_view'] = set()
-            view_dict['view_id'] = view_num
-            chosen = []
-            for candidate_point_idx, candidate_point in enumerate(point_locs):
-                if evaluate_nonfixated_camera_view_of_point(
-                        view_dict, candidate_point,
-                        acceptable_cameras=cameras_with_view_of_point[candidate_point_idx],
-                        camera=camera, empty=empty):
-                    view_dict['nonfixated_points_in_view'].add(candidate_point_idx)
-                    chosen.append(candidate_point_idx)
-            logger.debug("({}, {}) -> {}".format(point_num, view_num, chosen))
-    utils.delete_cameras_and_empties()
+#     for point_num, point_data in enumerate(point_datas):
+#         for view_num, view_dict in enumerate(point_data):
+#             view_dict['nonfixated_points_in_view'] = set()
+#             view_dict['view_id'] = view_num
+#             chosen = []
+#             for candidate_point_idx, candidate_point in enumerate(point_locs):
+#                 if evaluate_nonfixated_camera_view_of_point(
+#                         view_dict, candidate_point,
+#                         acceptable_cameras=cameras_with_view_of_point[candidate_point_idx],
+#                         camera=camera, empty=empty):
+#                     view_dict['nonfixated_points_in_view'].add(candidate_point_idx)
+#                     chosen.append(candidate_point_idx)
+#             logger.debug("({}, {}) -> {}".format(point_num, view_num, chosen))
+#     utils.delete_cameras_and_empties()
 
 
 def get_random_point_from_mesh(num_points, model):
@@ -531,31 +558,31 @@ def evaluate_camera_views_of_point(camera_locations, candidate_point):
     return camera_evaluations
 
 
-def evaluate_nonfixated_camera_view_of_point(view_dict, point, acceptable_cameras, camera, empty):
-    ''' Returns whether the given camera/pose has LOS to the given point 
-        Args:
-            view_dict: A view dict for the camera/pose
-            point: The target point
-            acceptable_cameras: A Set (or something with 'in') that is a list of all the cameras 
-                with an acceptable view of the point. This spares us the time requried to raycast.
-        Returns:
-            bool
-    '''
-    fixated_point = Vector(view_dict['point_location'])
-    if (fixated_point - point).magnitude < settings.LINE_OF_SITE_HIT_TOLERANCE:
-        return False  # Don't consider a camera seeing its point as a valid edge
-    empty.location = point
-    camera.location = view_dict["camera_location"]
-    camera.rotation_euler = view_dict["camera_rotation_final"]
-    utils.set_camera_fov(camera.data, view_dict["field_of_view_rads"])
-    bpy.context.scene.update()
+# def evaluate_nonfixated_camera_view_of_point(view_dict, point, acceptable_cameras, camera, empty):
+#     ''' Returns whether the given camera/pose has LOS to the given point 
+#         Args:
+#             view_dict: A view dict for the camera/pose
+#             point: The target point
+#             acceptable_cameras: A Set (or something with 'in') that is a list of all the cameras 
+#                 with an acceptable view of the point. This spares us the time requried to raycast.
+#         Returns:
+#             bool
+#     '''
+#     fixated_point = Vector(view_dict['point_location'])
+#     if (fixated_point - point).magnitude < settings.LINE_OF_SITE_HIT_TOLERANCE:
+#         return False  # Don't consider a camera seeing its point as a valid edge
+#     empty.location = point
+#     camera.location = view_dict["camera_location"]
+#     camera.rotation_euler = view_dict["camera_rotation_final"]
+#     utils.set_camera_fov(camera.data, view_dict["field_of_view_rads"])
+#     bpy.context.scene.update()
 
-    valid = False
-    if (is_point_inside_frustum(camera, point) and
-            view_dict['camera_uuid'] in acceptable_cameras):
+#     valid = False
+#     if (is_point_inside_frustum(camera, point) and
+#             view_dict['camera_uuid'] in acceptable_cameras):
 
-        valid = True
-    return valid
+#         valid = True
+#     return valid
 
 
 def filter_acceptable_cameras(camera_evaluations):
@@ -658,7 +685,7 @@ def save_point_data(point_data, basepath, point_uuid, fixated=True):
     if settings.POINT_TYPE == 'SWEEP':
         subdir = os.path.join('pano', TASK_NAME)
     else:
-        subdir = TASK_NAME if fixated else 'nonfixated'
+        subdir = TASK_NAME  #if fixated else 'nonfixated'
 
     try:
         os.mkdir(os.path.join(basepath, subdir))
@@ -672,7 +699,7 @@ def save_point_data(point_data, basepath, point_uuid, fixated=True):
     #     return
         
     point_dir = os.path.join(basepath, subdir)
-    task = 'fixated' if fixated else 'nonfixated'
+    task = 'fixated' #if fixated else 'nonfixated'
     if fixated:
         for view_num, view_dict in enumerate(point_data):
             # if (fixated and 'nonfixated_points_in_view' in view_dict and
@@ -680,6 +707,7 @@ def save_point_data(point_data, basepath, point_uuid, fixated=True):
             #     continue
             file_name = io_utils.get_file_name_for(point_dir, point_uuid, view_num,
                                                    view_dict['camera_uuid'], task + 'pose', 'json')
+
             outfile_path = os.path.join(basepath, subdir, file_name)
             with open(outfile_path, 'w') as outfile:
                 json.dump(view_dict, outfile)
@@ -774,8 +802,8 @@ def generate_points_per_camera(camera_poses, basepath):
 
 # SUMMARIES
 
-def is_keep_point(point_data):
-    return n_views([point_data], min_nonfixated=1) >= settings.MIN_VIEWS_PER_POINT
+# def is_keep_point(point_data):
+#     return n_views([point_data], min_nonfixated=1) >= settings.MIN_VIEWS_PER_POINT
 
 
 
@@ -805,3 +833,7 @@ if __name__ == '__main__':
 # 'point_uuid': '0', 'camera_location': (3.711273431777954, -5.541564464569092, -0.8323293924331665), 'skybox_img_path': './img/high/0002_skybox4.jpg', 
 # 'point_location': (5.16227388381958, -8.100662231445312, -1.5914720296859741), 
 # 'point_pitch': -0.24466912349196868, 'camera_rotation_from_original_to_final': (0.2216942012310028, 0.12206168472766876, 0.040772080421447754)}]
+
+
+# different naming (zerofill, fixated or interpolated)
+# change point_info (fixated or interpolated, update camera distance, line of sight or not)
