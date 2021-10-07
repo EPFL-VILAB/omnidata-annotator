@@ -18,5 +18,5 @@ args="${@:2}"
 
 # Generate normal images
 
-blender -b --enable-autoexec -noaudio --python $SCRIPT_PATH/create_rgb_images_UV_map.py -- \
+blender -b --enable-autoexec -noaudio --python $SCRIPT_PATH/create_rgb_images_obj_mtl.py -- \
 MODEL_PATH=$model_path $args
