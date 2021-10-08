@@ -161,7 +161,12 @@ RGB images can be generated if textures are provided as obj + mtl files. You sho
 | :-------------: |:-------------:|:-------------:|:-------------:|
 | ![](./assets/google-objects/point_5_view_2_domain_rgb_new.png) | ![](./assets/google-objects/point_22_view_0_domain_rgb.png) | ![](./assets/google-objects/point_21_view_5_domain_rgb.png) |![](./assets/google-objects/point_28_view_1_domain_rgb.png)
 
-#### Generate rgb images from textured meshes: (don't have the implementation yer :) )
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_0_view_3_domain_rgb.png) | ![](./assets/hm3d/point_7_view_1_domain_rgb.png) | ![](./assets/hm3d/point_12_view_1_domain_rgb.png) | ![](./assets/hm3d/point_27_view_0_domain_rgb.png)  | ![](./assets/hm3d/point_29_view_2_domain_rgb.png) 
 
 ### 3. Surface Normals:
 
@@ -182,7 +187,7 @@ This will generate fixated views.
 ```
 |  |  |  |  |  |
 | :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
-| ![](./assets/hm3d/point_39_view_2_domain_normal.png) | ![](./assets/hm3d/point_52_view_0_domain_normal.png) | ![](./assets/hm3d/point_47_view_0_domain_normal.png) | ![](./assets/hm3d/point_42_view_2_domain_normal.png)  | ![](./assets/hm3d/point_8_view_0_domain_normal.png) 
+| ![](./assets/hm3d/point_0_view_3_domain_normal.png) | ![](./assets/hm3d/point_7_view_1_domain_normal.png) | ![](./assets/hm3d/point_12_view_1_domain_normal.png) | ![](./assets/hm3d/point_27_view_0_domain_normal.png)  | ![](./assets/hm3d/point_29_view_2_domain_normal.png) 
 
 In case you want to generate panoramas switch to `CREATE_FIXATED=False`  and `CREATE_PANOS=True`:
 ```bash
@@ -221,7 +226,7 @@ ZBuffer depth is defined as the distance to the camera plane. The depth sensitiv
 ```
 |  |  |  |  |  |
 | :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
-| ![](./assets/hm3d/point_39_view_2_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_52_view_0_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_47_view_0_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_42_view_2_domain_depth_zbuffer.png)  | ![](./assets/hm3d/point_8_view_0_domain_depth_zbuffer.png) 
+| ![](./assets/hm3d/point_0_view_3_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_7_view_1_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_12_view_1_domain_depth_zbuffer.png) | ![](./assets/hm3d/point_27_view_0_domain_depth_zbuffer.png)  | ![](./assets/hm3d/point_29_view_2_domain_depth_zbuffer.png) 
 
 ### 5. Depth Euclidean:
 To generate depth euclidean images :
@@ -255,7 +260,7 @@ To generate reshading images :
 ```
 |  |  |  |  |  |
 | :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
-| ![](./assets/hm3d/point_39_view_2_domain_reshading.png) | ![](./assets/hm3d/point_52_view_0_domain_reshading.png) | ![](./assets/hm3d/point_47_view_0_domain_reshading.png) | ![](./assets/hm3d/point_42_view_2_domain_reshading.png)  | ![](./assets/hm3d/point_8_view_0_domain_reshading.png) 
+| ![](./assets/hm3d/point_0_view_3_domain_reshading.png) | ![](./assets/hm3d/point_7_view_1_domain_reshading.png) | ![](./assets/hm3d/point_12_view_1_domain_reshading.png) | ![](./assets/hm3d/point_27_view_0_domain_reshading.png)  | ![](./assets/hm3d/point_29_view_2_domain_reshading.png) 
 
 ### 7. Principal Curvature:
 To generate principal curvature run:
@@ -300,13 +305,13 @@ To generate 3D keypoint images use the command below:
 ```
 |  |  |  |  |  |
 | :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
-| ![](./assets/hm3d/point_39_view_2_domain_keypoints3d.png) | ![](./assets/hm3d/point_52_view_0_domain_keypoints3d.png) | ![](./assets/hm3d/point_47_view_0_domain_keypoints3d.png) | ![](./assets/hm3d/point_42_view_2_domain_keypoints3d.png)  | ![](./assets/hm3d/point_8_view_0_domain_keypoints3d.png) 
+| ![](./assets/hm3d/point_0_view_3_domain_keypoints3d.png) | ![](./assets/hm3d/point_7_view_1_domain_keypoints3d.png) | ![](./assets/hm3d/point_12_view_1_domain_keypoints3d.png) | ![](./assets/hm3d/point_27_view_0_domain_keypoints3d.png)  | ![](./assets/hm3d/point_29_view_2_domain_keypoints3d.png) 
 
 ### 10. Texture Edges:
 Texture(2D) Edges are computed from corresponding `RGB` images using **Canny edge detection** algorithm. To generate 2D edges:
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=edge2d \
-    with CANNY_RGB_BLUR_SIGMA=3.0
+    with CANNY_RGB_BLUR_SIGMA=0.5
 ```
 `CANNY_RGB_BLUR_SIGMA` specifies the sigma in Gaussian filter used in Canny edge detector.
 
@@ -314,6 +319,13 @@ Texture(2D) Edges are computed from corresponding `RGB` images using **Canny edg
 | :-------------: |:-------------:|:-------------:|
 | ![](./assets/replica/point_47_view_25_domain_rgb.png) | ![](./assets/clevr/point_2368_view_0_domain_rgb.png) |![](./assets/replica-gso/point_74_view_19_domain_rgb.png)|
 | ![](./assets/replica/point_47_view_25_domain_edge_texture2.png) | ![](./assets/clevr/point_2368_view_0_domain_edge_texture2.png) | ![](./assets/replica-gso/point_74_view_19_domain_edge_texture2.png) 
+
+```diff
+- HM3D Output:
+```
+|  |  |  |  |  |
+| :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
+| ![](./assets/hm3d/point_0_view_3_domain_edge_texture.png) | ![](./assets/hm3d/point_7_view_1_domain_edge_texture.png) | ![](./assets/hm3d/point_12_view_1_domain_edge_texture.png) | ![](./assets/hm3d/point_27_view_0_domain_edge_texture.png)  | ![](./assets/hm3d/point_29_view_2_domain_edge_texture.png) 
 
 ### 11. Occlusion Edges:
 Occlusion(3D) Edges are derived from `depth_zbuffer` images, so you have to generate those first. To generate 3D edges :
@@ -329,7 +341,6 @@ Occlusion(3D) Edges are derived from `depth_zbuffer` images, so you have to gene
   with SEGMENTATION_2D_BLUR=3     SEGMENTATION_2D_CUT_THRESH=0.005  \
        SEGMENTATION_2D_SCALE=200  SEGMENTATION_2D_SELF_EDGE_WEIGHT=2
 ```
-
 
 ### 13. 2.5D Segmentation:
 2.5D Segmentation uses the same algorithm as 2D, but the labels are computed jointly from `occlusion edges`, `depth zbuffer `, and `surface normals`. 2.5D segmentation incorporates information about the scene geometry that is not directly present in the `RGB` image.
@@ -355,13 +366,13 @@ You can specify the weights for each of the `occlusion edges`, `depth zbuffer`, 
 ```
 |  |  |  |  |  |
 | :-------------: |:-------------:|:-------------:|:-------------:|:-------------:|
-| ![](./assets/hm3d/point_39_view_2_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_52_view_0_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_47_view_0_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_42_view_2_domain_segment_unsup25d.png)  | ![](./assets/hm3d/point_8_view_0_domain_segment_unsup25d.png) 
+| ![](./assets/hm3d/point_0_view_3_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_7_view_1_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_12_view_1_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_27_view_0_domain_segment_unsup25d.png)  | ![](./assets/hm3d/point_29_view_2_domain_segment_unsup25d.png) 
 
 ### 14. Semantic Segmentation:
 Semantic segmentation images can be generated similar to rgb from obj+mtl files. You can run the following command:
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=semantic \
-  with SEMANTIC_MODEL_FILE=mesh.obj
+  with SEMANTIC_MODEL_FILE=mesh_semantic.obj
 ```
 Notice that you should specify the value for `SEMANTIC_MODEL_FILE` instead of `MODEL_FILE` which was used for other tasks.
 
@@ -369,6 +380,12 @@ Notice that you should specify the value for `SEMANTIC_MODEL_FILE` instead of `M
 | :-------------:|:-------------:|:-------------:|:-------------:|
 | ![](./assets/replica/point_246_view_34_domain_rgb.png) | ![](./assets/taskonomy/point_202_view_5_domain_rgb.png) |![](./assets/replica-gso/point_74_view_19_domain_rgb.png) | ![](./assets/hypersim/point_0_view_0_domain_rgb.png) |
 | ![](./assets/replica/point_246_view_34_domain_semantic3.png) | ![](./assets/taskonomy/point_202_view_5_domain_semantic3.png)|![](./assets/replica-gso/point_74_view_19_domain_semantic3.png) | ![](./assets/hypersim/point_0_view_0_domain_semantic.png)
+
+
+```diff
+- HM3D Output:
+```
+Habitat-Matterport doesn't include the semantic annotations.
 
 
 ## ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=+) Smooth Trajectory Sampling:
