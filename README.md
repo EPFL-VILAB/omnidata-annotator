@@ -51,8 +51,8 @@ The code for the annotator and the 3D model are now available in the docker unde
 
 
 ## Quickstart (run demo)
-Next, we show how to run the pipeline on a sample 3D mesh from the Habitat-Matterport 3D datast. You can download it from [here](https://drive.google.com/file/d/1B1Zxur6ywvpOpfQb49CQB_yW7jj4Ynnk/view?usp=sharing). After running the docker container, the mesh will be available under the `/model` directory.
-By running the following command you can generate a small sample dataset with 12 mid-level cues per each image. (Estimated run time:)
+We now run the pipeline on a sample 3D mesh from the Habitat-Matterport 3D datast. You can download it from [here](https://drive.google.com/file/d/1B1Zxur6ywvpOpfQb49CQB_yW7jj4Ynnk/view?usp=sharing). After running the docker container, the mesh will be available under the `/model` directory.
+By running the following command you can generate a small sample dataset with 12 mid-level cues per each image. (Estimated run time: up to 10 minutes)
 
 ``` bash
 cd /annotator
