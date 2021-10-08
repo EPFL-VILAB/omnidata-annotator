@@ -44,14 +44,12 @@ TASK_NAME = 'rgb'
 utils.set_random_seed()
 basepath = settings.MODEL_PATH
 
-
-
 def main():
     global basepath
     global TASK_NAME
     utils.delete_all_objects_in_context()
 
-    model = io_utils.import_mesh(basepath)
+    model = io_utils.import_mesh(basepath, typ='RGB')
 
     print("!!!!!!!!!!!!!!!!!!!!", bpy.context.object.data.materials)
     print("********************", bpy.data.materials)
@@ -66,7 +64,8 @@ def main():
     # engine='CYCLES'
     bpy.context.scene.render.engine = 'BLENDER_RENDER'
 
-    add_face_materials(engine, model)
+    utils.make_materials_shadeless(engine='BI')
+    # add_face_materials(engine, model)
 
     point_infos = io_utils.load_saved_points_of_interest(basepath)
 
