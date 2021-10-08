@@ -150,7 +150,7 @@ If the mesh is an object you have to specify `SCENE=False`. In this case, camera
 | ![](./assets/google-objects/point_11_view_0_domain_rgb.png) | ![](./assets/google-objects/point_19_view_4_domain_rgb.png) | ![](./assets/google-objects/point_21_view_0_domain_rgb.png) |![](./assets/google-objects/point_22_view_0_domain_rgb.png) | ![](./assets/google-objects/point_29_view_0_domain_rgb.png) 
 
 ### 2. RGB:
-RGB images can be generated if textures are provided as obj + mtl files. You should use `RGB_MODEL_FILE=mesh.obj` instead of the `ply` file. Make sure to set the correct `OBJ_AXIS_FORWARD` and `OBJ_AXIS_UP` to be consistent with `mesh.ply`.
+RGB images can be generated if textures are provided as obj + mtl files. You should use `mesh.obj` instead of the `ply` file. Make sure to set the correct `OBJ_AXIS_FORWARD` and `OBJ_AXIS_UP` to be consistent with `mesh.ply`. Notice that you should specify the value for `RGB_MODEL_FILE` instead of `MODEL_FILE` which is used for other tasks.
 
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=rgb \
@@ -358,28 +358,10 @@ You can specify the weights for each of the `occlusion edges`, `depth zbuffer`, 
 | ![](./assets/hm3d/point_39_view_2_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_52_view_0_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_47_view_0_domain_segment_unsup25d.png) | ![](./assets/hm3d/point_42_view_2_domain_segment_unsup25d.png)  | ![](./assets/hm3d/point_8_view_0_domain_segment_unsup25d.png) 
 
 ### 14. Semantic Segmentation:
-Semantic segmentation images can be generated fomr meshes with face colors. These colors should be saved as a face property named `color` in the `.ply` file.
-
-Below, you can see how this `color` property should be saved in `mesh_semantic.ply`.
-
-```bash
->>> from plyfile import PlyData
->>> model = PlyData.read('mesh_semantic.ply')
->>> faces = model.elements[1]
->>> faces.properties
-(PlyListProperty('vertex_indices', 'uchar', 'int'), PlyListProperty('color', 'uchar', 'int'))
->>> faces['color']
-array([array([ 96, 118,  19], dtype=int32),
-       array([ 48, 110, 165], dtype=int32),
-       array([ 96, 118,  19], dtype=int32), ...,
-       array([10, 10, 10], dtype=int32), array([10, 10, 10], dtype=int32),
-       array([10, 10, 10], dtype=int32)], dtype=object)
->>>
-```
-To generate semantic segmentation photos, run the command below:
+Semantic segmentation images can be generated similar to rgb from obj+mtl files. You can run the following command:
 ```bash
 ./omnidata-annotate.sh --model_path=/model --task=semantic \
-  with SEMANTIC_MODEL_FILE=mesh_semantic.ply
+  with SEMANTIC_MODEL_FILE=mesh.obj
 ```
 Notice that you should specify the value for `SEMANTIC_MODEL_FILE` instead of `MODEL_FILE` which was used for other tasks.
 
