@@ -46,7 +46,7 @@ case $task in
     bash jobs/create_segment25d_images_job.sh $model_path $args
     ;;
   semantic)
-    bash jobs/create_semantic_images_job.sh $model_path $args
+    bash jobs/create_semantic_images_obj_mtl_job.sh $model_path $args
     ;;
   vanishing_points)
     bash jobs/create_vanishing_points_job.sh $model_path $args

@@ -17,5 +17,5 @@ mkdir -p semantic
 args="${@:2}"
 
 # Generate semantic segmentation images
-blender -b --enable-autoexec -noaudio --python $SCRIPT_PATH/create_semantic_images.py -- \
+blender -b --enable-autoexec -noaudio --python $SCRIPT_PATH/create_semantic_images_obj_mtl.py -- \
 MODEL_PATH=$model_path $args

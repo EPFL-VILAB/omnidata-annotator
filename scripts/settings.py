@@ -24,8 +24,8 @@ CAMERA_POSE_FILE = "camera_poses.json"
 
 MODEL_PATH = ''
 MODEL_FILE = "mesh.ply"  
-SEMANTIC_MODEL_FILE = "semantic_lookup.obj"       # delete ?
-RGB_MODEL_FILE = "mesh.obj"      # delete ?
+SEMANTIC_MODEL_FILE = "mesh.obj"       
+RGB_MODEL_FILE = "mesh.obj"     
 
 
 # -----Render settings and performance -----

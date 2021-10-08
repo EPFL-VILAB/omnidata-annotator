@@ -39,7 +39,7 @@ from scipy.signal import find_peaks
 from create_images_utils import *
 
 SCRIPT_DIR_ABS_PATH = os.path.dirname(os.path.realpath(__file__))
-TASK_NAME = 'rgb'
+TASK_NAME = 'semantic'
 
 utils.set_random_seed()
 basepath = settings.MODEL_PATH
@@ -49,7 +49,7 @@ def main():
     global TASK_NAME
     utils.delete_all_objects_in_context()
 
-    model = io_utils.import_mesh(basepath, typ='RGB')
+    model = io_utils.import_mesh(basepath, typ='SEMANTIC')
 
     if settings.CREATE_PANOS:
         engine='CYCLES'

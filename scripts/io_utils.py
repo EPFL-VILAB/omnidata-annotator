@@ -498,7 +498,7 @@ def import_mesh(dir, typ='RAW'):
         model = join_meshes()  # OBJs often come in many many pieces
         bpy.context.scene.objects.active = model
         
-        if typ == 'RGB':
+        if typ in ['RGB', 'SEMANTIC']:
             return
 
         for img in bpy.data.images:  # remove all images
