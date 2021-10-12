@@ -442,3 +442,16 @@ ffmpeg -y -framerate 22 -pattern_type glob \
 | :-------------: |:-------------:| :-----:|
 | ![](./assets/hm3d/point_4_normal.gif) | ![](./assets/hm3d/point_0_normal.gif) | ![](./assets/hm3d/point_1_normal.gif) |
 | ![](./assets/hm3d/point_4_depth_zbuffer.gif) | ![](./assets/hm3d/point_0_depth_zbuffer.gif) | ![](./assets/hm3d/point_1_depth_zbuffer.gif)
+
+
+## Citation
+If you use the annotator, please cite our paper:
+```
+@inproceedings{eftekhar2021omnidata,
+  title={Omnidata: A Scalable Pipeline for Making Multi-Task Mid-Level Vision Datasets From 3D Scans},
+  author={Eftekhar, Ainaz and Sax, Alexander and Malik, Jitendra and Zamir, Amir},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={10786--10796},
+  year={2021}
+}
+```
