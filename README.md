@@ -449,7 +449,7 @@ If you use the annotator, please cite our paper:
 ```
 @inproceedings{eftekhar2021omnidata,
   title={Omnidata: A Scalable Pipeline for Making Multi-Task Mid-Level Vision Datasets From 3D Scans},
-  author={Eftekhar, Ainaz and Sax, Alexander and Malik, Jitendra and Zamir, Amir},
+  author={Eftekhar, Ainaz and Sax, Alexander and Bachmann, Roman and Malik, Jitendra and Zamir, Amir},
   booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
   pages={10786--10796},
   year={2021}
