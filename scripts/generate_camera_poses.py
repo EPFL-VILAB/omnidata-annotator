@@ -208,7 +208,7 @@ def sample_camera_locations_building(model, bbox_corners, n_samples, distance):
             continue
 
         # check if camera is inside the mesh
-        if not point_inside_mesh(point, model):
+        if not camera_inside_mesh(point, model):
             print("Camera outside mesh...")
             continue
 
@@ -225,7 +225,7 @@ def sample_camera_locations_building(model, bbox_corners, n_samples, distance):
     return camera_locations
 
 
-def point_inside_mesh(point, model):
+def camera_inside_mesh(point, model):
     ''' 
     Check if generated camera is inside the mesh. 
 
